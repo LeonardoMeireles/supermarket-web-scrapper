@@ -14,6 +14,18 @@ class WeekWorkingHours:
         self.Saturday = None
         self.Sunday = None
 
+class Product:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+        self.description = None
+        
+    def display_info(self):
+        print('- Product Info -')
+        print('Name: ', self.name)
+        print('Price: ', self.price)
+        print('Description: ', self.description)
+        
 class Supermarket:
     def __init__(self, url):
         self.name = None
@@ -25,6 +37,7 @@ class Supermarket:
         self.delivery_days = []
         self.delivery_price = None
         self.grab_delivery = False
+        self.products = []
     
     def display_info(self):
         print('- Supermarket Info -')
@@ -42,3 +55,4 @@ class Supermarket:
         print('Delivery Day: ', self.delivery_days)
         print('Delivery Price: ', self.delivery_price)
         print('Grab Delivery: ', self.grab_delivery)
+        print('Num of Products: ', len(self.products))

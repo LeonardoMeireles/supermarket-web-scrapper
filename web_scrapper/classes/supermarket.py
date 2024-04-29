@@ -15,16 +15,18 @@ class WeekWorkingHours:
         self.Sunday = None
 
 class Product:
-    def __init__(self, name, price):
+    def __init__(self, name, price, ean):
         self.name = name
         self.price = price
         self.description = None
+        self.ean = ean
         
     def display_info(self):
         print('- Product Info -')
         print('Name: ', self.name)
         print('Price: ', self.price)
         print('Description: ', self.description)
+        print('EAN: ', self.ean)
         
 class Supermarket:
     def __init__(self, url):
@@ -34,9 +36,8 @@ class Supermarket:
         self.zip_code = None
         self.cnpj = None #Won't be able to be retrieved in all sources
         self.working_hours = WeekWorkingHours()
-        self.delivery_days = []
         self.delivery_price = None
-        self.grab_delivery = False
+        self.takeout = False
         self.products = []
     
     def display_info(self):
@@ -52,7 +53,6 @@ class Supermarket:
                 print(f"    {day}: Does not open")
             else:
                 print(f"    {day}: {hours.start} - {hours.end}")
-        print('Delivery Day: ', self.delivery_days)
         print('Delivery Price: ', self.delivery_price)
-        print('Grab Delivery: ', self.grab_delivery)
+        print('Takeout: ', self.takeout)
         print('Num of Products: ', len(self.products))

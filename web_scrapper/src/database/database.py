@@ -33,7 +33,7 @@ def save_market_to_db(supermarket, cursor, geocoder):
         )
     else:
         response = geocoder.forward(
-            'Av Santos Dumont, 345 - Cidade Industrial Sa, Guarulhos - SP',
+            supermarket.address,
             types=['address'],
             limit=1,
             country=['br']
@@ -77,7 +77,7 @@ def save_working_hours(market_id, supermarket, cursor):
         cursor.execute(
             """
                 INSERT INTO working_hours (market_id, day_of_week, opening_time, closing_time)
-                VALUES (%s, %s::text, %s, %s)
+                VALUES (%s, %s, %s, %s)
                 ON CONFLICT (market_id, day_of_week)
                 DO UPDATE SET
                     opening_time = %s,
@@ -90,7 +90,7 @@ def save_products_to_db(market_id, supermarket, cursor):
     cursor.execute(
         """
             DELETE
-            FROM product
+            FROM market_product
             WHERE market_id = %s
         """,
         (market_id,)
@@ -98,13 +98,23 @@ def save_products_to_db(market_id, supermarket, cursor):
     for product in supermarket.products:
         # See how to add timestamp type to postgres
         # GET MARKET ID, CREATE OR GET FROM RESPONSE OF MARKET ADD
-        wh_values = (market_id, product.ean, product.name, product.description, product.price)
+        product_values = (product.ean, product.name, product.description)
         cursor.execute(
             """
-                INSERT INTO product (market_id, ean, name, description, price)
-                VALUES (%s, %s::text, %s::text, %s::text, %s::float)
+                INSERT INTO product (ean, name, description)
+                VALUES (%s, %s::text, %s::text)
+                ON CONFLICT DO NOTHING
             """,
-            wh_values
+            product_values
+        )
+        mp_values = (market_id, product.ean, product.price)
+        cursor.execute(
+            """
+                INSERT INTO market_product (market_id, ean, price)
+                VALUES (%s, %s, %s::float)
+                ON CONFLICT DO NOTHING
+            """,
+            mp_values
         )
 
 def save_to_db(supermarket, conn, geocoder):

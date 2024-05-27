@@ -138,26 +138,22 @@ def setup_browser():
     #Sleep avoids getting blocked by website
     time.sleep(2)
     
-    set_location(browser, 'Ermelino Matarazzo')
+    set_location(browser, 'Bairro Campestre')
     return browser
 
 def scrape_market_by_url(supermarket_url, conn, geocoder):
     supermarket = Supermarket(supermarket_url)
     supermarket.url = supermarket_url
-    try:
-        get_market_data_api(supermarket)
-        print(f'Got Market Data for {supermarket.name}')
-        get_products_api(supermarket)
-        if(len(supermarket.products) == 0):
-            raise Exception("No product collected")
-        save_to_db(supermarket, conn, geocoder)
-        supermarket.display_info()
-    except Exception as e:
-        print(e)
-        print("An error occurred while getting data from: ", supermarket_url)
-        print(str(e))
+    get_market_data_api(supermarket)
+    print(f'Got Market Data for {supermarket.name}')
+    get_products_api(supermarket)
+    if(len(supermarket.products) == 0):
+        raise Exception("No product collected")
+    save_to_db(supermarket, conn, geocoder)
+    supermarket.display_info()
   
-def ifood_market_scrape(conn, geocoder):
+def ifood_market_scrape(connDefault, geocoder):
+    conn = connDefault
     failed_supermarkets = []
     browser = setup_browser()
     urls = get_supermarket_pages(browser)
@@ -170,6 +166,8 @@ def ifood_market_scrape(conn, geocoder):
         try:
             scrape_market_by_url(supermarket_url, conn, geocoder)
         except Exception as e:
+            conn = connect_market_db()
+            print("An error occurred while getting data from: ", supermarket_url)
             print(str(e))
             failed_supermarkets.append(supermarket_url)
     print('Num of failed supermarkets: ', len(failed_supermarkets))
